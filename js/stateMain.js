@@ -30,6 +30,7 @@ var StateMain = {
 
         this.robot.animations.play("idle");
         this.robot.anchor.set(0.5, 0.5);
+        //Enable physics for the robot
         game.physics.arcade.enable(this.robot);
         this.robot.body.gravity.y = 100;
         this.robot.body.bounce.set(0.25);
@@ -37,12 +38,52 @@ var StateMain = {
 
         //Make the camera follow the robot!
         game.camera.follow(this.robot);
+        cursors = game.input.keyboard.createCursorKeys();
+
 
 
     },
 
     update: function () {
       game.physics.arcade.collide(this.robot, this.layer);
+
+      //Animation check
+      /*
+      Check the robots velocity
+      with Math.abs because we don't care if the value
+      is neg/pos as long as the velocity is over 100
+      */
+      if(Math.abs(this.robot.body.velocity.x) >100){
+        //Set animation to "walk"
+        this.robot.animations.play("walk");
+      }
+      else{
+        //otherwise play the "idle" animation
+        this.robot.animations.play("idle");
+      }
+
+      //Direction Facing 👈🏼 👉🏼
+      //Make sure the robot is face the correct direction
+      //If > 0 we know robot is moving to the right
+      if(this.robot.body.velocity.x > 0){
+        //Set the scale to 1 (default)
+        this.robot.scale.x = 1;
+      }
+      else{
+        //Otherwise robot is going left
+        //Set scale to -1 to flip the image
+        this.robot.scale.x = -1;
+      }//CLOSE scale set
+
+
+      //Cursors - Keyboard key check ⌨️
+      if(cursors.left.isDown){
+        this.robot.body.velocity.x = -250;
+      }
+      if(cursors.right.isDown){
+        this.robot.body.velocity.x = 250;
+      }//CLOSE cursors
+
 
     }
 
