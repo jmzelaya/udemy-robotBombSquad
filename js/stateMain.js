@@ -3,7 +3,7 @@ var StateMain = {
     preload: function () {
       game.load.spritesheet("robot", "images/main/robot.png", 80, 111, 28);
       game.load.images("tiles", "images/tiles.png");
-      game.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
+      game.load.tilemap("map", "maps/embedMap.json", null, Phaser.Tilemap.TILED_JSON);
     },
 
     create: function () {
@@ -14,8 +14,8 @@ var StateMain = {
         this.map = game.add.tilemap("map");
         this.map.addTilesetImage("tiles");
 
-        //"Tile Layer 1" refers to the name that Tiled gave to the map JSON file.
-        this.layer = this.map.createLater("Tile Layer 1");
+        //"Tile Layer 1" refers to the default name that Tiled gave to the map JSON file.
+        this.layer = this.map.createLayer("Tile Layer 1");
         //Resize the world to the size of the map
         this.layer.resizeWorld();
         //Set which tiles you want to enable collisions for
@@ -53,13 +53,16 @@ var StateMain = {
       with Math.abs because we don't care if the value
       is neg/pos as long as the velocity is over 100
       */
-      if(Math.abs(this.robot.body.velocity.x) >100){
-        //Set animation to "walk"
-        this.robot.animations.play("walk");
-      }
-      else{
-        //otherwise play the "idle" animation
-        this.robot.animations.play("idle");
+      //We only want these animations to play when the robot is on the ground
+      if(this.robot.body.onFloor()){
+          if(Math.abs(this.robot.body.velocity.x) >100){
+            //Set animation to "walk"
+            this.robot.animations.play("walk");
+          }
+          else{
+            //otherwise play the "idle" animation
+            this.robot.animations.play("idle");
+          }
       }
 
       //Direction Facing 👈🏼 👉🏼
@@ -83,6 +86,14 @@ var StateMain = {
       if(cursors.right.isDown){
         this.robot.body.velocity.x = 250;
       }//CLOSE cursors
+
+      //Jump
+      if(cursors.up.isDown){
+        if(this.robot.body.onFloor()){
+          this.robot.body.velocity.y = -150;
+          this.robot.animations.play("jump");
+        }
+      }
 
 
     }
